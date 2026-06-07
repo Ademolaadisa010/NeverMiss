@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -320,8 +320,7 @@ function AiMode({ onSave }: { onSave: (data: FormData) => void }) {
   const [confirmed, setConfirmed] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-//   const recognitionRef = useRef<SpeechRecognition | null>(null);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<{ stop(): void } | null>(null);
 
   const currentStep = AI_STEPS[stepIdx];
 
@@ -386,15 +385,26 @@ function AiMode({ onSave }: { onSave: (data: FormData) => void }) {
 
   const handleVoice = () => {
     if (typeof window === "undefined") return;
-    const SpeechRecognition =
-  (window as any).SpeechRecognition ||
-  (window as any).webkitSpeechRecognition;
 
-if (!SpeechRecognition) {
-  alert("Voice input isn't supported in your browser. Try Chrome.");
-  return;
-}
-    if (!SpeechRecognition) {
+    interface ISpeechRecognition extends EventTarget {
+      lang: string;
+      interimResults: boolean;
+      onresult: ((e: SpeechRecognitionEvent) => void) | null;
+      onerror: (() => void) | null;
+      onend: (() => void) | null;
+      start(): void;
+      stop(): void;
+    }
+    type SpeechRecognitionCtor = new () => ISpeechRecognition;
+
+    const w = window as Window & {
+      SpeechRecognition?: SpeechRecognitionCtor;
+      webkitSpeechRecognition?: SpeechRecognitionCtor;
+    };
+
+    const SpeechRecognitionAPI = w.SpeechRecognition ?? w.webkitSpeechRecognition;
+
+    if (!SpeechRecognitionAPI) {
       alert("Voice input isn't supported in your browser. Try Chrome.");
       return;
     }
@@ -403,10 +413,10 @@ if (!SpeechRecognition) {
       setListening(false);
       return;
     }
-    const r = new SpeechRecognition();
+    const r = new SpeechRecognitionAPI();
     r.lang = "en-US";
     r.interimResults = false;
-    r.onresult = (e: any) => {
+    r.onresult = (e: SpeechRecognitionEvent) => {
       setInput(e.results[0][0].transcript);
       setListening(false);
     };
@@ -637,7 +647,7 @@ function SuccessScreen({ task, onAnother }: { task: FormData; onAnother: () => v
 }
 
 // ── Page ─────────────────────────────────────────────────
-export default function CreateTaskPage() {
+function CreateTaskInner() {
   const searchParams = useSearchParams();
   const defaultMode = searchParams.get("mode") === "ai" ? "ai" : "form";
   const [mode, setMode] = useState<Mode>(defaultMode);
@@ -731,5 +741,22 @@ export default function CreateTaskPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function CreateTaskPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#0a0a1a] flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 rounded-full border-2 border-[#a78bfa] border-t-transparent animate-spin" />
+            <p className="text-white/40 text-sm">Loading…</p>
+          </div>
+        </div>
+      }
+    >
+      <CreateTaskInner />
+    </Suspense>
   );
 }

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Sora } from "next/font/google";
 import "./globals.css";
 
@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   description:
     "Never forget important tasks. NeverMiss combines AI, voice interaction, and smart notifications to keep you on track.",
   manifest: "/manifest.json",
+};
+
+export const viewport: Viewport = {
   themeColor: "#0a0a1a",
 };
 
