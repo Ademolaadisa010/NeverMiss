@@ -132,7 +132,7 @@ export default function Home() {
                 step: "01",
                 icon: "🎙️",
                 title: "Speak or Type",
-                desc: "Tell the AI your task naturally — no forms. Just say "Remind me about my dentist appointment on Friday at 3pm."",
+                desc: "Tell the AI your task naturally — no forms. Just say Remind me about my dentist appointment on Friday at 3pm.",
                 color: "from-[#a78bfa]/20 to-[#7c3aed]/5",
                 border: "border-[#a78bfa]/20",
                 accent: "#a78bfa",
