@@ -406,7 +406,7 @@ if (!SpeechRecognition) {
     const r = new SpeechRecognition();
     r.lang = "en-US";
     r.interimResults = false;
-    r.onresult = (e: SpeechRecognitionEvent) => {
+    r.onresult = (e: any) => {
       setInput(e.results[0][0].transcript);
       setListening(false);
     };
