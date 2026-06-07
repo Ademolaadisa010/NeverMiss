@@ -416,7 +416,7 @@ function AiMode({ onSave }: { onSave: (data: FormData) => void }) {
     const r = new SpeechRecognitionAPI();
     r.lang = "en-US";
     r.interimResults = false;
-    r.onresult = (e: SpeechRecognitionEvent) => {
+    r.onresult = (e: any) => {
       setInput(e.results[0][0].transcript);
       setListening(false);
     };
