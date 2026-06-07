@@ -386,10 +386,10 @@ function AiMode({ onSave }: { onSave: (data: FormData) => void }) {
   const handleVoice = () => {
     if (typeof window === "undefined") return;
 
-    interface ISpeechRecognition extends EventTarget {
+    interface ISpeechRecognition {
       lang: string;
       interimResults: boolean;
-      onresult: ((e: SpeechRecognitionEvent) => void) | null;
+      onresult: ((e: any) => void) | null;
       onerror: (() => void) | null;
       onend: (() => void) | null;
       start(): void;
