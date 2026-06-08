@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: "NeverMiss — AI Smart Reminder Assistant",
   description:
     "Never forget important tasks. NeverMiss combines AI, voice interaction, and smart notifications to keep you on track.",
-  manifest: "/manifest.json",
+  // manifest: "/manifest.json",
 };
 
 export const viewport: Viewport = {
