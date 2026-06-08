@@ -2,8 +2,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { onAuthStateChanged, signOut, User } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { User } from "firebase/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -22,14 +21,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      setLoading(false);
+    // Dynamically import firebase only on the client
+    let unsub: () => void;
+    import("firebase/auth").then(({ onAuthStateChanged, getAuth }) => {
+      import("@/lib/firebase").then(({ auth }) => {
+        unsub = onAuthStateChanged(auth, (u) => {
+          setUser(u);
+          setLoading(false);
+        });
+      });
     });
-    return () => unsub();
+    return () => { if (unsub) unsub(); };
   }, []);
 
   const logout = async () => {
+    const { signOut } = await import("firebase/auth");
+    const { auth } = await import("@/lib/firebase");
     await signOut(auth);
   };
 
