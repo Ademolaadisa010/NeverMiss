@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import AuthGuard from "@/components/AuthGuard";
+import { useAuth } from "@/context/AuthContext";
 
 // ── Types ────────────────────────────────────────────────
 type Priority = "high" | "medium" | "low";
@@ -264,7 +266,8 @@ function EmptyState({ filter }: { filter: string }) {
 }
 
 // ── Dashboard Page ───────────────────────────────────────
-export default function DashboardPage() {
+function DashboardContent() {
+  const { user, logout } = useAuth();
   const [tasks, setTasks] = useState<Task[]>(MOCK_TASKS);
   const [filter, setFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -358,13 +361,24 @@ export default function DashboardPage() {
 
         {/* User */}
         <div className="px-4 pb-5 pt-3 border-t border-white/5 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#a78bfa] to-[#7c3aed] flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
-            JD
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-white truncate">John Doe</p>
+          {user?.photoURL ? (
+            <img src={user.photoURL} alt="avatar" className="w-8 h-8 rounded-full flex-shrink-0 object-cover" />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#a78bfa] to-[#7c3aed] flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+              {user?.displayName?.[0] ?? "U"}
+            </div>
+          )}
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-white truncate">{user?.displayName ?? "User"}</p>
             <p className="text-xs text-white/30 truncate">Free plan</p>
           </div>
+          <button
+            onClick={logout}
+            title="Sign out"
+            className="w-7 h-7 rounded-lg border border-white/10 flex items-center justify-center text-white/30 hover:text-red-400 hover:border-red-500/30 transition-all flex-shrink-0 text-xs"
+          >
+            ↩
+          </button>
         </div>
       </aside>
 
@@ -572,5 +586,13 @@ export default function DashboardPage() {
         ))}
       </nav>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <AuthGuard>
+      <DashboardContent />
+    </AuthGuard>
   );
 }
