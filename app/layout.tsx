@@ -3,6 +3,8 @@ import type { Metadata, Viewport } from "next";
 import { Sora } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import ReminderProvider from "@/components/ReminderProvider";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
 const sora = Sora({
   variable: "--font-sora",
@@ -29,7 +31,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${sora.variable} h-full`}>
       <body className="min-h-full flex flex-col bg-[#0a0a1a] text-white antialiased">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <ReminderProvider>
+            {children}
+          </ReminderProvider>
+        </AuthProvider>
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
