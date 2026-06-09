@@ -1,4 +1,3 @@
-// public/sw.js — NeverMiss Service Worker
 
 const CACHE_NAME = "nevermiss-v1";
 const STATIC_ASSETS = [

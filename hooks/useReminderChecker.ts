@@ -1,6 +1,4 @@
-// hooks/useReminderChecker.ts
-// Runs every minute, checks if any task reminder should fire,
-// shows a browser notification + speaks it aloud via AI voice
+
 
 "use client";
 

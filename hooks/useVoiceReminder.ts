@@ -1,5 +1,4 @@
-// hooks/useVoiceReminder.ts
-// AI generates a unique friendly reminder message, then speaks it via Web Speech API
+
 
 "use client";
 

@@ -67,7 +67,7 @@ function deriveStatus(dateStr: string): Status {
   const diff = Math.round((d.getTime() - today.getTime()) / 86400000);
   if (diff === 0) return "today";
   if (diff > 0) return "upcoming";
-  return "upcoming"; // past dates still upcoming until completed
+  return "upcoming";
 }
 
 function formatDateDisplay(dateStr: string): string {
@@ -333,9 +333,22 @@ function AiMode({ onSave, saving }: { onSave: (data: FormData) => void; saving: 
 
   const handleVoice = () => {
     if (typeof window === "undefined") return;
+
+    interface ISpeechRecognitionResult {
+      readonly transcript: string;
+      readonly confidence: number;
+    }
+    interface ISpeechRecognitionResultList {
+      readonly length: number;
+      item(index: number): ISpeechRecognitionResult[];
+      [index: number]: ISpeechRecognitionResult[];
+    }
+    interface ISpeechRecognitionEvent {
+      readonly results: ISpeechRecognitionResultList;
+    }
     interface ISpeechRecognition {
       lang: string; interimResults: boolean;
-      onresult: ((e: SpeechRecognitionEvent) => void) | null;
+      onresult: ((e: ISpeechRecognitionEvent) => void) | null;
       onerror: (() => void) | null; onend: (() => void) | null;
       start(): void; stop(): void;
     }
@@ -346,7 +359,7 @@ function AiMode({ onSave, saving }: { onSave: (data: FormData) => void; saving: 
     if (listening) { recognitionRef.current?.stop(); setListening(false); return; }
     const r = new API();
     r.lang = "en-US"; r.interimResults = false;
-    r.onresult = (e: SpeechRecognitionEvent) => { setInput(e.results[0][0].transcript); setListening(false); };
+    r.onresult = (e: ISpeechRecognitionEvent) => { setInput(e.results[0][0].transcript); setListening(false); };
     r.onerror = () => setListening(false);
     r.onend = () => setListening(false);
     recognitionRef.current = r;
@@ -506,7 +519,6 @@ function CreateTaskInner() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  // ── Save to Firestore ─────────────────────────────────
   const handleSave = async (data: FormData) => {
     if (!user) return;
     setSaving(true);
@@ -516,8 +528,8 @@ function CreateTaskInner() {
         ...data,
         userId: user.uid,
         status: deriveStatus(data.date),
-        date: formatDateDisplay(data.date), // human-readable for display
-        rawDate: data.date,                 // ISO for sorting/filtering
+        date: formatDateDisplay(data.date),
+        rawDate: data.date,
         createdAt: serverTimestamp(),
       });
       setSavedTask(data);
@@ -542,7 +554,6 @@ function CreateTaskInner() {
         <div className="absolute bottom-0 right-10 w-64 h-64 rounded-full bg-[#f59e0b]/5 blur-[100px]" />
       </div>
 
-      {/* Header */}
       <header className="sticky top-0 z-30 border-b border-white/5 bg-[#0a0a1a]/80 backdrop-blur-md px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/dashboard" className="w-9 h-9 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center text-white/50 hover:text-white hover:border-white/20 transition-all">←</Link>
@@ -562,7 +573,6 @@ function CreateTaskInner() {
           <SuccessScreen task={savedTask} onAnother={handleAnother} />
         ) : (
           <>
-            {/* Mode toggle */}
             <div className="flex items-center gap-1 p-1 rounded-2xl border border-white/8 bg-white/[0.03] mb-6">
               {(["form", "ai"] as Mode[]).map((m) => (
                 <button key={m} onClick={() => setMode(m)}

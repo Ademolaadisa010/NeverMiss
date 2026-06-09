@@ -1,6 +1,4 @@
-// hooks/usePwaInstall.ts
-// Captures the browser's beforeinstallprompt event and provides
-// a function to trigger the native install dialog
+
 
 "use client";
 
